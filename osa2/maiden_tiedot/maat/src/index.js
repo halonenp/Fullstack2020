@@ -9,7 +9,6 @@ const Countries = (props) => {
   if (props.searchCountry !== '') {
     countriesToShow = props.countries.filter(country => country.name.toLowerCase().includes(props.searchCountry.toLowerCase()))
   }
-
   if (countriesToShow.length > 10 && props.searchCountry === '') {
     return (
       <Filter searchCountry={props.searchCountry} handleFilterChange={props.handleFilterChange} />
@@ -48,7 +47,6 @@ const Countries = (props) => {
       )}
     </div>
   )
-
 }
 
 const App = () => {
