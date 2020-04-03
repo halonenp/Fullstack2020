@@ -1,5 +1,8 @@
 import ReactDOM from 'react-dom'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+
+
 
 const App = () => {
   const [persons, setPersons] = useState([{ name: 'Arto Hellas', number: '040-123456' },
@@ -11,6 +14,14 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [showAll] = useState(false)
   const [newFilter, setNewFilter] = useState('')
+
+  useEffect(() => {
+    const eventHandler = response => {
+      setPersons(response.data)
+    }
+    const promise = axios.get('http://localhost:3001/persons')
+    promise.then(eventHandler)
+  }, [])
 
   const personsToShow = showAll
     ? persons
