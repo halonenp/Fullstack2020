@@ -1,31 +1,25 @@
 import ReactDOM from 'react-dom'
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
-
-
+import personsService from './services/persons'
 
 const App = () => {
-  const [persons, setPersons] = useState([{ name: 'Arto Hellas', number: '040-123456' },
-  { name: 'Ada Hel', number: '39-44-5323523' },
-  { name: 'Dan', number: '12-43-234345' },
-  { name: 'gay', number: '39-23-6423122' },
-  { name: 'kak', number: '69' }])
+  const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [showAll] = useState(false)
   const [newFilter, setNewFilter] = useState('')
 
   useEffect(() => {
-    const eventHandler = response => {
-      setPersons(response.data)
-    }
-    const promise = axios.get('http://localhost:3001/persons')
-    promise.then(eventHandler)
+    personsService
+      .getAll()
+      .then(response => {
+        setPersons(response)
+      })
   }, [])
 
   const personsToShow = showAll
     ? persons
-    : persons.filter(person => person.name.toUpperCase().includes(newFilter.toUpperCase()))
+    : persons.filter(person => person.name.toLowerCase().includes(newFilter.toLowerCase()))
 
   const handleFilterChange = (event) => {
     console.log(event.target.value)
@@ -50,11 +44,27 @@ const App = () => {
     if (persons.some(person => person.name === nameObject.name)) {
       alert(`${newName} is already added to phonebook`)
     } else {
-      setPersons(persons.concat(nameObject))
-      setNewName('')
-      setNewNumber('')
+
+      personsService
+        .create(nameObject)
+        .then(response => {
+          setPersons(persons.concat(response))
+          setNewName('')
+          setNewNumber('')
+        })
     }
   }
+  
+/*  const removePerson = (person) => {
+    if (window.confirm(`Delete ${person.name} ?`)) {
+      personsService
+        .remove(person.id)
+        .then((returnedNote) => {
+          setPersons(persons.map(note => note.id !== id ? note : returnedNote))
+        })
+    }
+  }*/
+
 
   return (
     <div>
@@ -76,18 +86,32 @@ const MapPersons = (props) => {
   return (
     <div>
       {props.personsToShow.map((person) =>
-        <Person key={person.name} person={person} />
+        <Person key={person.name} person={person} removePerson={removePerson} />
       )}
     </div>
   )
 }
+const removePerson = (person) => {
+  if (window.confirm(`Delete ${person.name} ?`)) {
+  personsService
+    .remove(person.id)
+      .catch(error => {
+        alert(
+          (`${person.name} has already been removed`)
+        )
+    })
+  }
+}
+
 const Person = ({ person }) => {
   return (
     <p>
       {person.name} {person.number}
+      <button onClick={() => removePerson(person) } >delete</button>
     </p>
   )
 }
+
 const PersonForm = (props) => {
   return (
     <div>
