@@ -1,6 +1,10 @@
 import ReactDOM from 'react-dom'
 import React, { useState, useEffect } from 'react'
 import personsService from './services/persons'
+import './index.css'
+import Message from './components/message'
+import Error from './components/error'
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -8,6 +12,8 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [showAll] = useState(false)
   const [newFilter, setNewFilter] = useState('')
+  const [message, setMessage] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     personsService
@@ -42,9 +48,26 @@ const App = () => {
       number: newNumber
     }
     if (persons.some(person => person.name === nameObject.name)) {
-      alert(`${newName} is already added to phonebook`)
+      if (window.confirm(`Update number for ${newName}?`)) {
+        const per = persons.find(per => per.name === newName)
+        personsService
+          .update(per.id, nameObject)
+          .then(response => {
+            setPersons(persons.map(person => person.id !== per.id ? person : response))
+            setNewName('')
+            setNewNumber('')
+          })
+          .catch(error => {
+            setMessage(null)
+            setError(
+              `${newName} has already been removed from server`)
+            setTimeout(() => {
+              setError(null)
+            }, 5000)
+          })
+        //alert(`${newName} is already added to phonebook`)
+      }
     } else {
-
       personsService
         .create(nameObject)
         .then(response => {
@@ -52,23 +75,45 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+      setMessage(
+        `${newName} added.`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     }
   }
-  
-/*  const removePerson = (person) => {
+
+  const removePerson = (person) => {
     if (window.confirm(`Delete ${person.name} ?`)) {
       personsService
         .remove(person.id)
-        .then((returnedNote) => {
-          setPersons(persons.map(note => note.id !== id ? note : returnedNote))
+        .then(response => {
+          setPersons(persons.filter(p => p.id !== person.id))
         })
+        .catch(error => {
+          setMessage(null)
+          setError(
+            `${person.name} has already been removed from server`)
+          setTimeout(() => {
+            setError(null)
+          }, 5000)
+        })
+        .then(response => {
+          setPersons(persons.filter(p => p.id !== person.id))
+        })
+      setMessage(
+        `${person.name} removed succesfully.`)
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
     }
-  }*/
-
+  }
 
   return (
     <div>
       <h2>Phonebook</h2>
+      <Error message={error} />
+      <Message message={message} />
       <div>
         filter shown with: <input value={newFilter} onChange={handleFilterChange} />
       </div>
@@ -78,36 +123,26 @@ const App = () => {
           newNumber={newNumber} handleNumberChange={handleNumberChange} />
       </form>
       <h2>Numbers</h2>
-      <MapPersons personsToShow={personsToShow} />
+      <MapPersons personsToShow={personsToShow} removePerson={removePerson} />
     </div>
   )
 }
+
 const MapPersons = (props) => {
   return (
     <div>
       {props.personsToShow.map((person) =>
-        <Person key={person.name} person={person} removePerson={removePerson} />
+        <Person key={person.name} person={person} removePerson={() => props.removePerson(person)} />
       )}
     </div>
   )
 }
-const removePerson = (person) => {
-  if (window.confirm(`Delete ${person.name} ?`)) {
-  personsService
-    .remove(person.id)
-      .catch(error => {
-        alert(
-          (`${person.name} has already been removed`)
-        )
-    })
-  }
-}
 
-const Person = ({ person }) => {
+const Person = ({ person, removePerson }) => {
   return (
     <p>
       {person.name} {person.number}
-      <button onClick={() => removePerson(person) } >delete</button>
+      <button onClick={removePerson} >delete</button>
     </p>
   )
 }
