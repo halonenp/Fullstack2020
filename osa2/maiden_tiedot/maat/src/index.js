@@ -1,62 +1,12 @@
-
-import ReactDOM from 'react-dom';
-import axios from 'axios'
 import React, { useState, useEffect } from 'react'
-
-
-const Countries = (props) => {
-  let countriesToShow = props.countries
-  if (props.searchCountry !== '') {
-    countriesToShow = props.countries.filter(country => country.name.toLowerCase().includes(props.searchCountry.toLowerCase()))
-  }
-  if (countriesToShow.length > 10 && props.searchCountry === '') {
-    return (
-      <Filter searchCountry={props.searchCountry} handleFilterChange={props.handleFilterChange} />
-    )
-  }
-
-  else if (countriesToShow.length > 10 && props.searchCountry !== '') {
-    return (
-      <div>
-        <Filter searchCountry={props.searchCountry} handleFilterChange={props.handleFilterChange} />
-        <p>Too many matches, specify another filter</p>
-      </div>
-    )
-  }
-  else if (countriesToShow.length === 1 && props.searchCountry !== '') {
-    return (
-      <div>
-        {countriesToShow.map((country, i) =>
-          <Country key={i} country={country} setSearchCountry={props.setSearchCountry}
-
-            searchCountry={props.searchCountry} handleFilterChange={props.handleFilterChange}
-            number='1' />
-        )}
-      </div>
-    )
-  }
-  return (
-    <div>
-      <Filter searchCountry={props.searchCountry} handleFilterChange={props.handleFilterChange}
-        setSearchCountry={props.setSearchCountry} />
-
-      {countriesToShow.map((country, i) =>
-        <Country key={i} country={country}
-          setSearchCountry={props.setSearchCountry}
-          number='0' />
-      )}
-    </div>
-  )
-}
+import axios from 'axios'
+import ReactDOM from 'react-dom';
 
 const App = () => {
   const [countries, setCountries] = useState([])
-  const [searchCountry, setSearchCountry] = useState('')
-  //const [showAll, setShowAll] = useState('')
-
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
-    console.log('kak')
     axios
       .get('https://restcountries.eu/rest/v2/all')
       .then(response => {
@@ -64,69 +14,97 @@ const App = () => {
       })
   }, [])
 
-  const handleFilterChange = (event) => {
-    setSearchCountry(event.target.value)
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value)
+    console.log('okke')
   }
 
   const handleClick = (event) => {
-    setSearchCountry(event.target.value)
+    setSearch(event.target.id)
+    console.log('jaha')
   }
 
+  const countriesToShow = countries.filter(country =>
+    (country.name.toLowerCase().includes(search.toLowerCase())))
   return (
     <div>
-
-      <Countries countries={countries}
-        handleFilterChange={handleFilterChange} searchCountry={searchCountry}
-        setSearchCountry={setSearchCountry} handleClick={handleClick} />
-
-    </div>
-  )
-}
-const Filter = (props) => {
-
-
-  return (
-    <div>find countries
-      <input
-        value={props.searchCountry}
-        onChange={props.handleFilterChange} />
-    </div>
-  )
-}
-const Languages = (props) => {
-  return (
-    props.languages.map(language => <li key={language.nativeName}>{language.name}</li>)
-  )
-}
-
-const Country = (props) => {
-  if (props.number === '1') {
-    return (
-
       <div>
-        <h2>{props.country.name}</h2>
-       capital {props.country.capital}
-        <br />
-        population {props.country.population}
-        <br />
-        <h3>
-          Spoken Languages
-        </h3>
-        <Languages languages={props.country.languages} />
-        <p>
-          <img style={{ width: '100%', high: '100%' }} src={props.country.flag} alt="Flag" />
-        </p>
+        {<Filter search={search}
+          handleSearchChange={handleSearchChange} />}
+      </div>
+      <div>
+        {<Countries countriesToShow={countriesToShow}
+          handleClick={handleClick} />}
+      </div>
+    </div>
+  )
+}
 
+const Country = ({ country, handleClick }) => {
+  return (
+    <div>
+      <li>{country.name}<Button onClick={handleClick} id={country.name} /></li>
+    </div>
+  )
+}
+
+const CountryInfo = ({ country }) => {
+  return (
+    <div>
+      <h1>{country.name}</h1>
+      <div>
+        Capital: {country.capital}
+      </div>
+      <div>
+        Population: {country.population}
+      </div>
+      <h3>languages</h3>
+      {country.languages.map(language =>
+        <li key={language.name}>{language.name}</li>)}
+      <img src={country.flag} alt='flag' height="20%" width="20%" />
+    </div>
+  )
+}
+
+const Countries = ({ countriesToShow, handleClick }) => {
+  if (countriesToShow.length > 10) {
+    return (
+      <div>
+        Too many matches, specify
+      </div>
+    )
+  } if (countriesToShow.length === 0) {
+    return (
+      <div>
+        No countries to show
       </div>
     )
   }
+  if (countriesToShow.length === 1) {
+    return (
+      countriesToShow.map(country =>
+        <CountryInfo key={country.name} country={country} />)
+    )
+  } else {
+    return (
+      countriesToShow.map(country =>
+        <Country key={country.name} country={country} handleClick={handleClick} />)
+    )
+  }
+}
 
+const Filter = ({ handleSearchChange, search }) => {
   return (
-    <li>{props.country.name}
-      <button type="button" onClick={() => props.setSearchCountry(props.country.name)}>
-        show
-      </button>
-    </li>
+    <form onSubmit={handleSearchChange}>
+      find countries:
+      <input value={search} onChange={handleSearchChange} />
+    </form>
+  )
+}
+
+const Button = ({ onClick, id }) => {
+  return (
+    <button onClick={onClick} id={id}>show</button>
   )
 }
 
