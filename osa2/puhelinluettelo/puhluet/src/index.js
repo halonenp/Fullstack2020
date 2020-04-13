@@ -75,6 +75,15 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+        
+        .catch(error => {
+          setMessage(null)
+          setError(
+            'Name minimum length 3 and number minimum length 8')
+          setTimeout(() => {
+            setError(null)
+          }, 5000)
+        })
       setMessage(
         `${newName} added.`)
       setTimeout(() => {
