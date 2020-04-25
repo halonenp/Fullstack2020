@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 
-const Blog = ({ blog, removeBlog, user}) => {
+const Blog = ({ blog, removeBlog, addLike}) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -22,24 +22,31 @@ const Blog = ({ blog, removeBlog, user}) => {
         await removeBlog(blog)
     }
 
+    const handleLike = async (event) => {
+        event.preventDefault()
+        await addLike()
+       
+        
+    }
+
     return (
         <div style={blogStyle}>
-            <div onClick={toggleExpanded()}>
+            <div onClick={toggleExpanded()} className="toggleB">
                 {blog.title} by {blog.author}
             </div>
             <div style={expand}>
                 <div>
                     <a href={blog.url}>{blog.url}</a>
                 </div>
-                <div>
-                    {blog.likes} likes <button >Like</button>
+                <div className="likeB">
+                {blog.likes} likes <button onClick={handleLike}>Like</button>
                 </div>
                 
-                <div >
-                added by {/*blog.*/user.name}
+                <div>
+               added by {/*blog.user.name*/}
                
                 </div>
-                <div >
+                <div>
                     <button onClick={handleRemove}>Remove</button>
                 </div>
             </div>

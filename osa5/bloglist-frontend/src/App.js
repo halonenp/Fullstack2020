@@ -43,7 +43,9 @@ const App = () => {
     </form>
   )
   
-
+  const addLike = async () => {
+    console.log('liked')
+}
   const addBlog = (blogObject) => {
     noteFormRef.current.toggleVisibility()
     blogService
@@ -144,7 +146,7 @@ const removeBlog = async (blog) => {
         {blogForm()}
       </div>
       {blogs.sort((x, y) => y.likes - x.likes).map(blog =>
-        <Blog key={blog.id} blog={blog}  removeBlog={() => removeBlog(blog)} user={user} />)}
+        <Blog key={blog.id} blog={blog}  removeBlog={() => removeBlog(blog)} user={user} addLike={() => addLike()} />)}
     </div>
   )
 }
