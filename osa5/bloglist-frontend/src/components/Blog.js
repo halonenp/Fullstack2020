@@ -31,7 +31,7 @@ const Blog = ({ blog, removeBlog, addLike}) => {
 
     return (
         <div style={blogStyle}>
-            <div onClick={toggleExpanded()} className="toggleB">
+            <div id='expand' onClick={toggleExpanded()} className="toggleB">
                 {blog.title} by {blog.author}
             </div>
             <div style={expand}>
@@ -46,8 +46,8 @@ const Blog = ({ blog, removeBlog, addLike}) => {
                added by {/*blog.user.name*/}
                
                 </div>
-                <div>
-                    <button onClick={handleRemove}>Remove</button>
+                <div id='remov'>
+                    <button  onClick={handleRemove}>Remove</button>
                 </div>
             </div>
 
