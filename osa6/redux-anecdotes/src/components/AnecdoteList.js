@@ -19,10 +19,10 @@ const Anecdote = ({ anecdote, handleClick }) => {
     )
 }
 
-const AnecdoteList = () => {
+const AnecdoteList = (props) => {
     const dispatch = useDispatch()
     const anecdotes = useSelector(state => state.anecdotes)
-
+    
     return (
         <ul>
             {anecdotes.sort((x, y) => y.votes - x.votes).map(anecdote =>
@@ -30,11 +30,8 @@ const AnecdoteList = () => {
                     key={anecdote.id}
                     anecdote={anecdote}
                     handleClick={() => {
-                        dispatch(vote(anecdote.id))
-                        dispatch(setNotification(`Voted on "${anecdote.content}"`))
-                        setTimeout(()=> {
-                            dispatch(setNotification(''))
-                        },5000)
+                        dispatch(vote(anecdote.id, anecdote.content, anecdote.votes))
+                        dispatch(setNotification(`Voted on "${anecdote.content}"`, 5))
                     }
                     }
                 />
