@@ -1,16 +1,18 @@
 
 import React, { useState } from 'react'
-import ReactDOM from 'react-dom'
+//import ReactDOM from 'react-dom'
 
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link,
-  Redirect,
+  //Redirect,
   useRouteMatch,
   useHistory,
 } from "react-router-dom"
+import { useField } from './hooks'
+
 
 const Menu = () => {
   const padding = {
@@ -26,14 +28,6 @@ const Menu = () => {
   )
 }
 
-/*const AnecdoteList = ({ anecdotes }) => (
-  <div>
-    <h2>Anecdotes</h2>
-    <ul>
-      {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
-    </ul>
-  </div>
-)*/
 const AnecdoteList = ({ anecdotes }) => (
   <div>
     <h2>Anecdotes</h2>
@@ -92,44 +86,48 @@ const Notification = ({ notification }) => {
 }
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  const content = useField('text')
+  const author = useField('text')
+  const info = useField('text')
   const history = useHistory()
-
 
   const handleSubmit = (e) => {
     e.preventDefault()
     props.addNew({
-      content,
-      author,
-      info,
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
     })
     history.push("/")
   }
 
+  const resetForm = () => {
+    document.getElementById("createForm").reset();
+  }
+
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit}>
+      <form id="createForm">
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input {...content} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input {...author} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e) => setInfo(e.target.value)} />
+          <input {...info} />
         </div>
-        <button>create</button>
+        <button onClick={handleSubmit}>create</button>
+        <button onClick={resetForm}>Reset</button>
       </form>
+
     </div>
   )
-
 }
 
 const App = () => {
@@ -162,10 +160,10 @@ const App = () => {
     }, 10000)
   }
 
-  const anecdoteById = (id) =>
-    anecdotes.find(a => a.id === id)
+  /*const anecdoteById = (id) =>
+    anecdotes.find(a => a.id === id)*/
 
-  const vote = (id) => {
+  /*const vote = (id) => {
     const anecdote = anecdoteById(id)
 
     const voted = {
@@ -174,7 +172,8 @@ const App = () => {
     }
 
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
-  }
+  }*/
+
   const match = useRouteMatch('/anecdotes/:id')
   const anecdoteId = match
     ? anecdotes.find(anecdote => anecdote.id === match.params.id)
