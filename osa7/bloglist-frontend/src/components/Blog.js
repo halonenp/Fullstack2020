@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import {  Button } from 'react-bootstrap'
 
 const Blog = ({ blog, handleLike, handleRemove, own }) => {
   const [visible, setVisible] = useState(false)
@@ -17,16 +18,16 @@ const Blog = ({ blog, handleLike, handleRemove, own }) => {
   return (
     <div style={blogStyle} className='blog'>
       <div>
-        <i>{blog.title}</i> by {blog.author} <button onClick={() => setVisible(!visible)}>{label}</button>
+        <i>{blog.title}</i> by {blog.author} <Button size="sm" variant="outline-light" onClick={() => setVisible(!visible)}>{label}</Button>
       </div>
       {visible && (
         <div>
           <div>{blog.url}</div>
           <div>likes {blog.likes}
-            <button onClick={() => handleLike(blog.id)}>like</button>
+            <Button variant="outline-light" onClick={() => handleLike(blog.id)}>like</Button>
           </div>
           <div>{blog.user.name}</div>
-          {own && <button onClick={() => handleRemove(blog.id)}>remove</button>}
+          {own && <Button variant="outline-light" onClick={() => handleRemove(blog.id)}>remove</Button>}
         </div>
       )}
     </div>

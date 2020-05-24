@@ -8,6 +8,7 @@ import loginService from './services/login'
 import storage from './utils/storage'
 import { useDispatch } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
+import { Table, Form, Button } from 'react-bootstrap'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -45,7 +46,7 @@ const App = () => {
 
     }
   }
-  
+
   const createBlog = async (blog) => {
     try {
       const newBlog = await blogService.create(blog)
@@ -80,28 +81,32 @@ const App = () => {
 
   if (!user) {
     return (
-      <div>
+      <div className="container">
         <h2>login to application</h2>
         <Notification />
-        <form onSubmit={handleLogin}>
-          <div>
-            username
-            <input
-              id='username'
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password
-            <input
-              id='password'
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button id='login'>login</button>
-        </form>
+        <Form onSubmit={handleLogin}>
+          <Form.Group>
+            <div>
+              <Form.Label>username:</Form.Label>
+              <Form.Control
+                type="text"
+                id='username'
+                value={username}
+                onChange={({ target }) => setUsername(target.value)}
+              />
+            </div>
+            <div>
+              <Form.Label>password:</Form.Label>
+              <Form.Control
+                type="password"
+                id='password'
+                value={password}
+                onChange={({ target }) => setPassword(target.value)}
+              />
+            </div>
+            <Button variant="outline-primary" id='login' type="submit">login</Button>
+          </Form.Group>
+        </Form>
       </div>
     )
   }
@@ -109,24 +114,30 @@ const App = () => {
   const byLikes = (b1, b2) => b2.likes - b1.likes
 
   return (
-    <div>
+    <div className="container">
       <h2>blogs</h2>
       <Notification />
-      <p>
-        {user.name} logged in <button onClick={handleLogout}>logout</button>
-      </p>
+      {user.name} logged in <Button variant="outline-secondary" onClick={handleLogout}>logout</Button>
       <Togglable buttonLabel='create new blog' ref={blogFormRef}>
         <NewBlog createBlog={createBlog} />
       </Togglable>
-      {blogs.sort(byLikes).map(blog =>
-        <Blog
-          key={blog.id}
-          blog={blog}
-          handleLike={handleLike}
-          handleRemove={handleRemove}
-          own={true}
-        />
-      )}
+      <Table striped hover bordered variant="dark" size="sm">
+        <tbody>
+          {blogs.sort(byLikes).map(blog =>
+          <tr key={blog.id}>
+            <td>
+            <Blog
+              key={blog.id}
+              blog={blog}
+              handleLike={handleLike}
+              handleRemove={handleRemove}
+              own={true}
+            />
+            </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
     </div>
   )
 }
